@@ -1,5 +1,6 @@
 import { FlightMap } from './components/FlightMap'
 import { StatsPanel } from './components/StatsPanel'
+import { TrackingPanel } from './components/TrackingPanel'
 import './index.css'
 
 function App() {
@@ -14,7 +15,7 @@ function App() {
 
       <div className="panel-container right-panel">
         <div className="card-title">Flight Tracker</div>
-        <div style={{ flex: 1, border: '1px dashed #333' }}>[Tracking Panel Placeholder]</div>
+        <TrackingPanel />
       </div>
     </>
   )
