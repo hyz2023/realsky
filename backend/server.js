@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
+require('dotenv').config();
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -13,13 +15,27 @@ let flightDataCache = { time: 0, states: [] };
 
 async function fetchFlightData() {
     try {
-        const response = await axios.get(OPENSKY_URL);
+        const config = {};
+        // Add authentication if credentials are provided in .env
+        if (process.env.OPENSKY_USERNAME && process.env.OPENSKY_PASSWORD) {
+            config.auth = {
+                username: process.env.OPENSKY_USERNAME,
+                password: process.env.OPENSKY_PASSWORD
+            };
+        }
+
+        const response = await axios.get(OPENSKY_URL, config);
         if (response.data && response.data.states) {
             flightDataCache = response.data;
-            console.log(`Fetched ${response.data.states.length} flights at ${new Date().toISOString()}`);
+            const authStatus = config.auth ? '(Authenticated)' : '(Anonymous)';
+            console.log(`Fetched ${response.data.states.length} flights at ${new Date().toISOString()} ${authStatus}`);
         }
     } catch (error) {
-        console.error('Error fetching OpenSky data:', error.message);
+        if (error.response && error.response.status === 429) {
+            console.error('API Rate Limit Exceeded (429). If anonymous, you may have hit the 400 requests/day limit.');
+        } else {
+            console.error('Error fetching OpenSky data:', error.message);
+        }
     }
 }
 
