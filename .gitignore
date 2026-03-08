@@ -1,3 +1,5 @@
 .agent/
 .DS_Store
 .worktrees/
+.env
+node_modules/
